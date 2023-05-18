@@ -1,0 +1,85 @@
+---
+title: "test"
+output: html_document
+date: '2023-04-24'
+---
+
+```{r}
+options(scipen=999)
+
+suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(tidyr))
+suppressPackageStartupMessages(library(tidyverse))
+suppressPackageStartupMessages(library(ggplot2))
+suppressPackageStartupMessages(library(cowplot))
+suppressPackageStartupMessages(library(ComplexHeatmap))
+suppressPackageStartupMessages(library(RColorBrewer))
+```
+
+
+```{r}
+df = read.csv("./data/peak_vari_results.csv")
+df
+# p = ggplot(df, aes(x = name, y = vari_ratio, color = factor(accession))) +
+#   geom_point() +
+#   xlab('TF') +
+#   ylab('Proportion') +
+#   coord_flip() +
+#   theme_cowplot()
+# p
+# ggsave("./results/peak_vari.png", p, width=7, height=8, units="in", limitsize = FALSE)
+
+df = df %>%
+  select(c(name, accession, vari_ratio)) %>%
+  pivot_wider(names_from = accession, values_from = vari_ratio) %>%
+  column_to_rownames(var = "name")
+df
+
+png(filename = "./results/peak_vari_heatmap.png", width=5, height=6, units="in", res = 1200)
+hmap = Heatmap(df,
+        name = "TF vs. acccession",
+        col = brewer.pal(9, 'YlOrRd'),
+        rect_gp = gpar(col = "gray90", lwd = 0.5),
+        row_names_gp = gpar(fontsize = 10),
+        column_names_gp = gpar(fontsize = 10),
+        cell_fun = function(j, i, x, y, width, height, fill) {
+        grid.text(sprintf("%.2f", df[i, j]), x, y, gp = gpar(fontsize = 6, col = "#120954"))
+})
+
+hmap
+dev.off()
+```
+
+```{r}
+df = read.csv("./data/motif_vari_results.csv")
+df
+# p = ggplot(df, aes(x = name, y = vari_ratio, color = factor(accession))) +
+#   geom_point() +
+#   xlab('TF') +
+#   ylab('Proportion') +
+#   coord_flip() +
+#   theme_cowplot()
+# p
+# ggsave("./results/motif_vari.png", p, width=7, height=8, units="in", limitsize = FALSE)
+
+df = df %>%
+  select(c(name, accession, vari_ratio)) %>%
+  pivot_wider(names_from = accession, values_from = vari_ratio) %>%
+  column_to_rownames(var = "name")
+df
+
+png(filename = "./results/motif_vari_heatmap.png", width=5, height=6, units="in", res = 1200)
+hmap = Heatmap(df,
+        name = "TF vs. acccession",
+        col = brewer.pal(9, 'YlOrRd'),
+        rect_gp = gpar(col = "gray90", lwd = 0.5),
+        row_names_gp = gpar(fontsize = 10),
+        column_names_gp = gpar(fontsize = 10),
+        cell_fun = function(j, i, x, y, width, height, fill) {
+        grid.text(sprintf("%.2f", df[i, j]), x, y, gp = gpar(fontsize = 6, col = "#120954"))
+})
+
+hmap
+dev.off()
+```
+
